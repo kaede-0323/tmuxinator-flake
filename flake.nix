@@ -1,14 +1,10 @@
 {
-  description = "Tmuxinator NixOS flake module";
+  description = "Tmuxinator NixOS/Home-Manager flake modules";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-  outputs = {
-    self,
-    nixpkgs,
-    ...
-  }: {
-    nixosModules.tmuxinator = import ./modules/tmuxinator.nix;
-    homeManagerModules.tmuxinator = import ./modules/tmuxinator.nix;
+  outputs = { ... }: {
+    nixosModules.tmuxinator = import ./modules/nixos.nix;
+    homeManagerModules.tmuxinator = import ./modules/home-manager.nix;
   };
 }
