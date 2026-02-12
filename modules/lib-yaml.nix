@@ -7,22 +7,21 @@
       if rawCommand == "" || rawCommand == null
       then "\"\""
       else rawCommand;
-
     root = paneAttrs.root or null;
     shell = paneAttrs.shell or null;
   in
     builtins.concatStringsSep "\n" (
       concatLists [
-        ["    - command: ${commandVal}"]
+        ["        - command: ${commandVal}"]
         (
           if root == null
           then []
-          else ["      root: ${root}"]
+          else ["          root: ${root}"]
         )
         (
           if shell == null
           then []
-          else ["      shell: ${shell}"]
+          else ["          shell: ${shell}"]
         )
       ]
     );
@@ -40,18 +39,18 @@
       (
         if layout == null
         then []
-        else ["  layout: ${layout}"]
+        else ["      layout: ${layout}"]
       )
       (
         if root == null
         then []
-        else ["  root: ${root}"]
+        else ["      root: ${root}"]
       )
       (
         if focus == null
         then []
         else [
-          "  focus: ${
+          "      focus: ${
             if focus
             then "true"
             else "false"
@@ -61,22 +60,23 @@
       (
         if shell == null
         then []
-        else ["  shell: ${shell}"]
+        else ["      shell: ${shell}"]
       )
       (
         if pre == null
         then []
-        else ["  pre: ${builtins.concatStringsSep ", " pre}"]
+        else ["      pre: ${builtins.concatStringsSep ", " pre}"]
       )
       (
         if post == null
         then []
-        else ["  post: ${builtins.concatStringsSep ", " post}"]
+        else ["      post: ${builtins.concatStringsSep ", " post}"]
       )
-      (["  panes:"] ++ map generatePaneYaml panes)
+      (["      panes:"] ++ map generatePaneYaml panes)
     ];
 
   generateSessionYaml = sessionAttrs: let
+    name = sessionAttrs.sessionName or null;
     root = sessionAttrs.root or null;
     env = sessionAttrs.env or null;
     pre = sessionAttrs.pre or null;
@@ -86,6 +86,9 @@
   in
     builtins.concatStringsSep "\n" (
       concatLists [
+        (
+          assert name == null; ["name: ${name}"]
+        )
         (
           if root == null
           then []
@@ -111,7 +114,14 @@
           then []
           else ["tmux_options: ${builtins.concatStringsSep ", " tmuxOptions}"]
         )
-        (concatLists (mapAttrsToList (windowName: attrs: ["${windowName}:"] ++ (generateWindowYaml attrs)) windows))
+
+        # Windowsセクションの開始
+        ["windows:"]
+        (concatLists (mapAttrsToList (
+            windowName: attrs:
+              ["  - ${windowName}:"] ++ (generateWindowYaml attrs)
+          )
+          windows))
       ]
     );
 in {
