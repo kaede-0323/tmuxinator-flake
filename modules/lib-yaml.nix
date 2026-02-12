@@ -88,10 +88,13 @@
         in
           if isScalarNode element
           then "${itemPrefix} ${renderNode depth element}\n"
-          else if isMapNode element
-          then "${itemPrefix}\n${renderNode (depth + 1) element}"
-          else if isListNode element
-          then "${itemPrefix}\n${renderNode (depth + 1) element}"
+          else if isMapNode element || isListNode element
+          then let
+            childDepth = depth + 1;
+            rendered = renderNode childDepth element;
+            stripLen = builtins.stringLength (indentAtDepth childDepth);
+            strippedRendered = builtins.substring stripLen (builtins.stringLength rendered) rendered;
+          in "${itemPrefix} ${strippedRendered}"
           else throw "Unsupported list element node"
       )
       node.elements;
