@@ -1,9 +1,15 @@
 {
+  config,
   lib,
+  options,
   pkgs,
   ...
 }:
 with lib; let
+  cfg = config.tmuxinator.sessions or {};
+
+  isHomeManagerModule = options ? home;
+
   # pane YAML
   generatePaneYaml = paneAttrs: let
     cmd = paneAttrs.command or "";
@@ -133,18 +139,26 @@ in {
     };
   };
 
-  config = {
-    home.packages =
-      (config.home.packages or [])
-      ++ [
-        pkgs.tmuxinator
-      ];
-    home.file = builtins.listToAttrs (
-      mapAttrsToList (sessionName: sessionAttrs: {
-        name = ".tmuxinator/${sessionName}.yml";
-        text = generateSessionYaml sessionAttrs;
-      })
-      (config.tmuxinator.sessions or {})
-    );
-  };
+  config = mkMerge [
+    (mkIf isHomeManagerModule {
+      home.packages = mkAfter [pkgs.tmuxinator];
+      home.file = builtins.listToAttrs (
+        mapAttrsToList (sessionName: sessionAttrs: {
+          name = ".tmuxinator/${sessionName}.yml";
+          value.text = generateSessionYaml sessionAttrs;
+        })
+        cfg
+      );
+    })
+    (mkIf (!isHomeManagerModule) {
+      environment.systemPackages = mkAfter [pkgs.tmuxinator];
+      environment.etc = builtins.listToAttrs (
+        mapAttrsToList (sessionName: sessionAttrs: {
+          name = "tmuxinator/${sessionName}.yml";
+          value.text = generateSessionYaml sessionAttrs;
+        })
+        cfg
+      );
+    })
+  ];
 }
