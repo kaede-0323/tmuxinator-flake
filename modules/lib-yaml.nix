@@ -2,18 +2,33 @@
   inherit (lib) attrNames concatLists mapAttrsToList;
 
   generatePaneYaml = paneAttrs: let
-    command = paneAttrs.command or "";
+    command = paneAttrs.command or null;
+    root = paneAttrs.root or null;
     shell = paneAttrs.shell or null;
   in
-    if shell == null
-    then "    - ${command}"
-    else "    - shell: ${shell}\n      command: ${command}";
+    concatLists [
+      ["    -"]
+      (
+        if command == null
+        then []
+        else ["  command: ${command}"]
+      )
+      (
+        if root == null
+        then []
+        else ["  root: ${root}"]
+      )
+      (
+        if shell == null
+        then []
+        else ["  shell: ${shell}"]
+      )
+    ];
 
   generateWindowYaml = windowAttrs: let
     layout = windowAttrs.layout or null;
     root = windowAttrs.root or null;
     focus = windowAttrs.focus or null;
-    startDir = windowAttrs.startDir or null;
     shell = windowAttrs.shell or null;
     pre = windowAttrs.pre or null;
     post = windowAttrs.post or null;
@@ -40,11 +55,6 @@
             else "false"
           }"
         ]
-      )
-      (
-        if startDir == null
-        then []
-        else ["  start_dir: ${startDir}"]
       )
       (
         if shell == null

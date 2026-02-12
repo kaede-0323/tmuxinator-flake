@@ -51,10 +51,6 @@ in {
                   type = lib.types.nullOr lib.types.bool;
                   default = null;
                 };
-                startDir = lib.mkOption {
-                  type = lib.types.nullOr lib.types.str;
-                  default = null;
-                };
                 shell = lib.mkOption {
                   type = lib.types.nullOr lib.types.str;
                   default = null;
