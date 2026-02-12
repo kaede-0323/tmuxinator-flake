@@ -1,5 +1,5 @@
 {lib}: let
-  inherit (lib) all concatMapStrings concatStringsSep isAttrs isBool isInt isList isNull isString;
+  inherit (lib) all concatMapStrings concatStringsSep isAttrs isBool isInt isList isString;
 
   scalarNode = valueType: value: {
     _type = "ScalarNode";
@@ -67,22 +67,23 @@
     if node.entries == []
     then "{}"
     else
-      concatMapStrings (entry:
-        let
+      concatMapStrings (
+        entry: let
           valueNode = entry.value_node;
           entryPrefix = "${indentAtDepth depth}${entry.key}:";
         in
           if isScalarNode valueNode
           then "${entryPrefix} ${renderNode depth valueNode}\n"
           else "${entryPrefix}\n${renderNode (depth + 1) valueNode}"
-      ) node.entries;
+      )
+      node.entries;
 
   renderList = depth: node:
     if node.elements == []
     then "[]"
     else
-      concatMapStrings (element:
-        let
+      concatMapStrings (
+        element: let
           itemPrefix = "${indentAtDepth depth}-";
         in
           if isScalarNode element
@@ -92,10 +93,11 @@
           else if isListNode element
           then "${itemPrefix}\n${renderNode (depth + 1) element}"
           else throw "Unsupported list element node"
-      ) node.elements;
+      )
+      node.elements;
 
   normalizeScalar = value:
-    if isNull value
+    if value == null
     then scalarNode "null" null
     else if isBool value
     then scalarNode "bool" value
@@ -105,7 +107,6 @@
     then scalarNode "string" value
     else throw "Unsupported scalar value";
 
-
   orderedEntriesToMapNode = entries:
     if isList entries && all (entry: isAttrs entry && entry ? key && isString entry.key && entry ? value) entries
     then
@@ -113,7 +114,8 @@
         map (entry: {
           key = entry.key;
           value_node = normalizeUnionValue entry.value;
-        }) entries
+        })
+        entries
       )
     else throw "Ordered map entries must be a list of { key, value }";
 
@@ -133,20 +135,18 @@
     then throw "Unordered attribute set detected; use {_ordered_entries = [ ... ]}"
     else normalizeScalar value;
 
-  toYaml = value:
-    let
-      ast = normalizeUnionValue value;
-      rendered = renderNode 0 ast;
-    in
-      if builtins.substring ((builtins.stringLength rendered) - 1) 1 rendered == "\n"
-      then rendered
-      else "${rendered}\n";
+  toYaml = value: let
+    ast = normalizeUnionValue value;
+    rendered = renderNode 0 ast;
+  in
+    if builtins.substring ((builtins.stringLength rendered) - 1) 1 rendered == "\n"
+    then rendered
+    else "${rendered}\n";
 
   nonNullEntry = key: value:
     if value == null
     then []
     else [{inherit key value;}];
-
 
   paneToEntries = paneAttrs:
     nonNullEntry "command" (paneAttrs.command or "")
@@ -160,32 +160,55 @@
     ++ nonNullEntry "pre" (windowAttrs.pre or null)
     ++ nonNullEntry "post" (windowAttrs.post or null)
     ++ nonNullEntry "panes" (
-      map (paneAttrs: {_ordered_entries = paneToEntries paneAttrs;}) (if (windowAttrs.panes or null) == null then [] else windowAttrs.panes)
+      map (paneAttrs: {_ordered_entries = paneToEntries paneAttrs;}) (
+        if (windowAttrs.panes or null) == null
+        then []
+        else windowAttrs.panes
+      )
     );
 
   sessionToOrderedEntries = sessionName: sessionAttrs:
-    [{
-      key = "name";
-      value = sessionName;
-    }]
+    [
+      {
+        key = "name";
+        value = sessionName;
+      }
+    ]
     ++ nonNullEntry "root" (sessionAttrs.root or null)
-    ++ nonNullEntry "env" (if (sessionAttrs.env or null) == null then null else map (entry: {_ordered_entries = [{ key = entry.name; value = entry.value; }];}) sessionAttrs.env)
+    ++ nonNullEntry "env" (
+      if (sessionAttrs.env or null) == null
+      then null
+      else
+        map (entry: {
+          _ordered_entries = [
+            {
+              key = entry.name;
+              value = entry.value;
+            }
+          ];
+        })
+        sessionAttrs.env
+    )
     ++ nonNullEntry "pre" (sessionAttrs.pre or null)
     ++ nonNullEntry "post" (sessionAttrs.post or null)
     ++ nonNullEntry "tmux_options" (sessionAttrs.tmuxOptions or null)
-    ++ [{
-      key = "windows";
-      value = map (window:
-        {
-          _ordered_entries = [{
-            key = window.name;
-            value = {
-              _ordered_entries = windowToEntries window;
-            };
-          }];
-        })
-      (sessionAttrs.windows or []);
-    }];
+    ++ [
+      {
+        key = "windows";
+        value =
+          map (window: {
+            _ordered_entries = [
+              {
+                key = window.name;
+                value = {
+                  _ordered_entries = windowToEntries window;
+                };
+              }
+            ];
+          })
+          (sessionAttrs.windows or []);
+      }
+    ];
 in {
   inherit toYaml;
 
