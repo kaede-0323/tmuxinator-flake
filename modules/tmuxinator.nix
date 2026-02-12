@@ -134,6 +134,11 @@ in {
   };
 
   config = mkIf (builtins.length (attrNames config.tmuxinator.sessions) > 0) {
+    home.packages =
+      (config.home.packages or [])
+      ++ [
+        pkgs.tmuxinator
+      ];
     home.file = builtins.listToAttrs (
       mapAttrsToList (sessionName: sessionAttrs: {
         name = ".tmuxinator/${sessionName}.yml";
