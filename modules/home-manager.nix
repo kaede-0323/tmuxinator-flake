@@ -8,7 +8,7 @@
 in {
   options.programs.tmuxinator = {
     enable = lib.mkOption {
-      type = lib.type.bool;
+      type = lib.types.bool;
       default = false;
       description = "Enable tmuxinator support in Home-manager";
     };
