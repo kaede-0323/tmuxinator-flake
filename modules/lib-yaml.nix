@@ -2,27 +2,27 @@
   inherit (lib) attrNames concatLists mapAttrsToList;
 
   generatePaneYaml = paneAttrs: let
-    command = paneAttrs.command or null;
+    rawCommand = paneAttrs.command or "";
+    commandVal =
+      if rawCommand == "" || rawCommand == null
+      then "\"\""
+      else rawCommand;
+
     root = paneAttrs.root or null;
     shell = paneAttrs.shell or null;
   in
     builtins.concatStringsSep "\n" (
       concatLists [
-        ["    -"]
-        (
-          if command == null
-          then []
-          else ["  command: ${command}"]
-        )
+        ["    - command: ${commandVal}"]
         (
           if root == null
           then []
-          else ["  root: ${root}"]
+          else ["      root: ${root}"]
         )
         (
           if shell == null
           then []
-          else ["  shell: ${shell}"]
+          else ["      shell: ${shell}"]
         )
       ]
     );
@@ -111,7 +111,6 @@
           then []
           else ["tmux_options: ${builtins.concatStringsSep ", " tmuxOptions}"]
         )
-        # ここでリスト同士の結合 (List ++ List) が正しく機能するようになります
         (concatLists (mapAttrsToList (windowName: attrs: ["${windowName}:"] ++ (generateWindowYaml attrs)) windows))
       ]
     );
