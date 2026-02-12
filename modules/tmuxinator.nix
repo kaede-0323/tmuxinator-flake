@@ -133,7 +133,7 @@ in {
     };
   };
 
-  config = mkIf (builtins.length (attrNames config.tmuxinator.sessions) > 0) {
+  config = {
     home.packages =
       (config.home.packages or [])
       ++ [
