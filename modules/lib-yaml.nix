@@ -62,7 +62,7 @@
           then []
           else ["  post: ${builtins.concatStringsSep ", " post}"]
         )
-        (["  panes:"] ++ map generatePaneYaml panes)
+        (["  panes:"] ++ concatLists (map generatePaneYaml panes))
       ]
     );
 
