@@ -19,52 +19,50 @@
     post = windowAttrs.post or null;
     panes = windowAttrs.panes or [];
   in
-    builtins.concatStringsSep "\n" (
-      concatLists [
-        (
-          if layout == null
-          then []
-          else ["  layout: ${layout}"]
-        )
-        (
-          if root == null
-          then []
-          else ["  root: ${root}"]
-        )
-        (
-          if focus == null
-          then []
-          else [
-            "  focus: ${
-              if focus
-              then "true"
-              else "false"
-            }"
-          ]
-        )
-        (
-          if startDir == null
-          then []
-          else ["  start_dir: ${startDir}"]
-        )
-        (
-          if shell == null
-          then []
-          else ["  shell: ${shell}"]
-        )
-        (
-          if pre == null
-          then []
-          else ["  pre: ${builtins.concatStringsSep ", " pre}"]
-        )
-        (
-          if post == null
-          then []
-          else ["  post: ${builtins.concatStringsSep ", " post}"]
-        )
-        (["  panes:"] ++ map generatePaneYaml panes)
-      ]
-    );
+    concatLists [
+      (
+        if layout == null
+        then []
+        else ["  layout: ${layout}"]
+      )
+      (
+        if root == null
+        then []
+        else ["  root: ${root}"]
+      )
+      (
+        if focus == null
+        then []
+        else [
+          "  focus: ${
+            if focus
+            then "true"
+            else "false"
+          }"
+        ]
+      )
+      (
+        if startDir == null
+        then []
+        else ["  start_dir: ${startDir}"]
+      )
+      (
+        if shell == null
+        then []
+        else ["  shell: ${shell}"]
+      )
+      (
+        if pre == null
+        then []
+        else ["  pre: ${builtins.concatStringsSep ", " pre}"]
+      )
+      (
+        if post == null
+        then []
+        else ["  post: ${builtins.concatStringsSep ", " post}"]
+      )
+      (["  panes:"] ++ map generatePaneYaml panes)
+    ];
 
   generateSessionYaml = sessionAttrs: let
     root = sessionAttrs.root or null;
@@ -101,7 +99,8 @@
           then []
           else ["tmux_options: ${builtins.concatStringsSep ", " tmuxOptions}"]
         )
-        (concatLists (mapAttrsToList (windowName: attrs: ["${windowName}:"] ++ (concatLists (generateWindowYaml attrs))) windows))
+        # ここでリスト同士の結合 (List ++ List) が正しく機能するようになります
+        (concatLists (mapAttrsToList (windowName: attrs: ["${windowName}:"] ++ (generateWindowYaml attrs)) windows))
       ]
     );
 in {
