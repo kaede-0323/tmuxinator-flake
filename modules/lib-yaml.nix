@@ -75,8 +75,8 @@
       (["      panes:"] ++ map generatePaneYaml panes)
     ];
 
-  generateSessionYaml = sessionAttrs: let
-    name = sessionAttrs.sessionName or null;
+  generateSessionYaml = sessionAttrs: sessionName: let
+    name = sessionName;
     root = sessionAttrs.root or null;
     env = sessionAttrs.env or null;
     pre = sessionAttrs.pre or null;
@@ -86,9 +86,7 @@
   in
     builtins.concatStringsSep "\n" (
       concatLists [
-        (
-          assert name == null; ["name: ${name}"]
-        )
+        ["name: ${name}"]
         (
           if root == null
           then []

@@ -76,7 +76,7 @@ in {
     environment.etc = builtins.listToAttrs (
       lib.mapAttrsToList (sessionName: sessionAttrs: {
         name = "tmuxinator/${sessionName}.yml";
-        value.text = yaml.generateSessionYaml sessionAttrs;
+        value.text = yaml.generateSessionYaml sessionName sessionAttrs;
       })
       sessions
     );
