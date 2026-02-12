@@ -7,17 +7,11 @@
       if rawCommand == "" || rawCommand == null
       then "\"\""
       else rawCommand;
-    root = paneAttrs.root or null;
     shell = paneAttrs.shell or null;
   in
     builtins.concatStringsSep "\n" (
       concatLists [
         ["        - command: ${commandVal}"]
-        (
-          if root == null
-          then []
-          else ["          root: ${root}"]
-        )
         (
           if shell == null
           then []
