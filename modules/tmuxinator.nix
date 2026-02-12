@@ -1,9 +1,11 @@
 {
+  config,
   lib,
   pkgs,
   ...
 }:
 with lib; let
+  sessions = config.tmuxinator.sessions or {};
   # pane YAML
   generatePaneYaml = paneAttrs: let
     cmd = paneAttrs.command or "";
@@ -144,7 +146,7 @@ in {
         name = ".tmuxinator/${sessionName}.yml";
         text = generateSessionYaml sessionAttrs;
       })
-      config.tmuxinator.sessions
+      sessions
     );
   };
 }
