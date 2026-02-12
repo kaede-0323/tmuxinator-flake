@@ -62,7 +62,7 @@
           then []
           else ["  post: ${builtins.concatStringsSep ", " post}"]
         )
-        (["  panes:"] ++ concatLists (map generatePaneYaml panes))
+        (["  panes:"] ++ map generatePaneYaml panes)
       ]
     );
 
@@ -101,7 +101,7 @@
           then []
           else ["tmux_options: ${builtins.concatStringsSep ", " tmuxOptions}"]
         )
-        (concatLists (mapAttrsToList (windowName: attrs: ["${windowName}:"] ++ (lib.strings.split "\n" (generateWindowYaml attrs))) windows))
+        (concatLists (mapAttrsToList (windowName: attrs: ["${windowName}:"] ++ (concatLists (generateWindowYaml attrs))) windows))
       ]
     );
 in {
