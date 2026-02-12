@@ -7,17 +7,8 @@
     self,
     nixpkgs,
     ...
-  }: let
-    system = "x86_64-linux";
-    pkgs = import nixpkgs {inherit system;};
-  in {
-    nixosModules.tmuxinator = import ./modules/tmuxinator.nix {
-      inherit pkgs;
-      lib = pkgs.lib;
-    };
-    homeManagerModules.tmuxinator = import ./modules/tmuxinator.nix {
-      inherit pkgs;
-      lib = pkgs.lib;
-    };
+  }: {
+    nixosModules.tmuxinator = import ./modules/tmuxinator.nix;
+    homeManagerModules.tmuxinator = import ./modules/tmuxinator.nix;
   };
 }
