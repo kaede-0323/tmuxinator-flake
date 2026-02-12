@@ -21,7 +21,16 @@ in {
             default = null;
           };
           env = lib.mkOption {
-            type = lib.types.nullOr (lib.types.attrsOf lib.types.str);
+            type = lib.types.nullOr (lib.types.listOf (lib.types.submodule {
+              options = {
+                name = lib.mkOption {
+                  type = lib.types.str;
+                };
+                value = lib.mkOption {
+                  type = lib.types.str;
+                };
+              };
+            }));
             default = null;
           };
           pre = lib.mkOption {
@@ -37,8 +46,11 @@ in {
             default = null;
           };
           windows = lib.mkOption {
-            type = lib.types.attrsOf (lib.types.submodule {
+            type = lib.types.listOf (lib.types.submodule {
               options = {
+                name = lib.mkOption {
+                  type = lib.types.str;
+                };
                 layout = lib.mkOption {
                   type = lib.types.nullOr lib.types.str;
                   default = null;
@@ -64,12 +76,23 @@ in {
                   default = null;
                 };
                 panes = lib.mkOption {
-                  type = lib.types.nullOr (lib.types.listOf (lib.types.attrsOf (lib.types.nullOr lib.types.str)));
+                  type = lib.types.nullOr (lib.types.listOf (lib.types.submodule {
+                    options = {
+                      command = lib.mkOption {
+                        type = lib.types.nullOr lib.types.str;
+                        default = null;
+                      };
+                      shell = lib.mkOption {
+                        type = lib.types.nullOr lib.types.str;
+                        default = null;
+                      };
+                    };
+                  }));
                   default = null;
                 };
               };
             });
-            default = {};
+            default = [];
           };
         };
       });
