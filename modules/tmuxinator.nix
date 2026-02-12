@@ -117,20 +117,20 @@ with lib; let
 in {
   options.tmuxinator = {
     sessions = lib.mkOption {
-      type = lib.attrsOf (
-        lib.attrsOf (
-          lib.attrsOf {
-            layout = lib.types.nullOr lib.str;
-            panes = lib.types.nullOr (lib.listOf (lib.attrsOf {
-              command = lib.str;
-              shell = lib.types.nullOr lib.str;
+      type = lib.types.attrsOf (
+        lib.types.attrsOf (
+          lib.types.attrsOf {
+            layout = lib.types.nullOr lib.types.str;
+            panes = lib.types.nullOr (lib.types.listOf (lib.types.attrsOf {
+              command = lib.types.str;
+              shell = lib.types.nullOr lib.types.str;
             }));
-            startDir = lib.types.nullOr lib.str;
-            root = lib.types.nullOr lib.str;
-            shell = lib.types.nullOr lib.str;
+            startDir = lib.types.nullOr lib.types.str;
+            root = lib.types.nullOr lib.types.str;
+            shell = lib.types.nullOr lib.types.str;
             focus = lib.types.nullOr lib.bool;
-            pre = lib.types.nullOr (lib.listOf lib.str);
-            post = lib.types.nullOr (lib.listOf lib.str);
+            pre = lib.types.nullOr (lib.types.listOf lib.types.str);
+            post = lib.types.nullOr (lib.types.listOf lib.types.str);
           }
         )
       );
