@@ -75,7 +75,7 @@
       (["      panes:"] ++ map generatePaneYaml panes)
     ];
 
-  generateSessionYaml = sessionAttrs: sessionName: let
+  generateSessionYaml = sessionName: sessionAttrs: let
     name = sessionName;
     root = sessionAttrs.root or null;
     env = sessionAttrs.env or null;
