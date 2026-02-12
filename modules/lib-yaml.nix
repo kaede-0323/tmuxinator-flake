@@ -6,24 +6,26 @@
     root = paneAttrs.root or null;
     shell = paneAttrs.shell or null;
   in
-    concatLists [
-      ["    -"]
-      (
-        if command == null
-        then []
-        else ["  command: ${command}"]
-      )
-      (
-        if root == null
-        then []
-        else ["  root: ${root}"]
-      )
-      (
-        if shell == null
-        then []
-        else ["  shell: ${shell}"]
-      )
-    ];
+    builtins.concatStringsSep "\n" (
+      concatLists [
+        ["    -"]
+        (
+          if command == null
+          then []
+          else ["  command: ${command}"]
+        )
+        (
+          if root == null
+          then []
+          else ["  root: ${root}"]
+        )
+        (
+          if shell == null
+          then []
+          else ["  shell: ${shell}"]
+        )
+      ]
+    );
 
   generateWindowYaml = windowAttrs: let
     layout = windowAttrs.layout or null;
