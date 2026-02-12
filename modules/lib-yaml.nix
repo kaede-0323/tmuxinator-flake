@@ -101,7 +101,7 @@
           then []
           else ["tmux_options: ${builtins.concatStringsSep ", " tmuxOptions}"]
         )
-        (concatLists (mapAttrsToList (windowName: attrs: ["${windowName}:"] ++ (builtins.splitString "\n" (generateWindowYaml attrs))) windows))
+        (concatLists (mapAttrsToList (windowName: attrs: ["${windowName}:"] ++ (lib.strings.split "\n" (generateWindowYaml attrs))) windows))
       ]
     );
 in {
