@@ -116,20 +116,24 @@ with lib; let
     );
 in {
   options.tmuxinator = {
-    sessions = mkOption {
-      type = attrsOf (attrsOf (attrsOf (union {
-        layout = str;
-        panes = listOf (attrsOf {
-          command = str;
-          shell = str;
-        });
-        startDir = str;
-        root = str;
-        shell = str;
-        focus = bool;
-        pre = listOf str;
-        post = listOf str;
-      })));
+    sessions = lib.mkOption {
+      type = lib.attrsOf (
+        lib.attrsOf (
+          lib.attrsOf {
+            layout = lib.types.nullOr lib.str;
+            panes = lib.types.nullOr (lib.listOf (lib.attrsOf {
+              command = lib.str;
+              shell = lib.types.nullOr lib.str;
+            }));
+            startDir = lib.types.nullOr lib.str;
+            root = lib.types.nullOr lib.str;
+            shell = lib.types.nullOr lib.str;
+            focus = lib.types.nullOr lib.bool;
+            pre = lib.types.nullOr (lib.listOf lib.str);
+            post = lib.types.nullOr (lib.listOf lib.str);
+          }
+        )
+      );
       default = {};
       description = ''
         Tmuxinator sessions full definition.
